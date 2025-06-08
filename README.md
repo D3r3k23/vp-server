@@ -1,2 +1,3 @@
 # vp-server
-VPS
+
+VPS configuration

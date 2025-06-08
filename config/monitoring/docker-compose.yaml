@@ -1,0 +1,39 @@
+name: monitoring
+
+networks:
+  monitoring:
+    name: monitoring
+    driver: bridge
+
+services:
+  dozzle-agent:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    networks:
+      - monitoring
+    command: agent
+    ports:
+      - 7007:7007
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, /dozzle, healthcheck]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+      start_interval: 5s
+
+  uptime-kuma:
+    container_name: uptime-kuma
+    image: louislam/uptime-kuma:1
+    networks:
+      - monitoring
+    ports:
+      - 3001:3001
+    volumes:
+      - ${HOME}/vp-server/appdata/uptime-kuma:/app/data
+    restart: unless-stopped
+    labels:
+      dev.dozzle.group: uptime-kuma

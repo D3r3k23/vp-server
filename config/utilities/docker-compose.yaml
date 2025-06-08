@@ -1,0 +1,39 @@
+name: utilities
+
+networks:
+  utilities:
+    name: utilities
+    driver: bridge
+
+services:
+  file-browser:
+    container_name: file-browser
+    image: filebrowser/filebrowser:latest
+    networks:
+      - utilities
+    ports:
+      - 7080:80
+    volumes:
+      - ${HOME}/vp-server/appdata/file-browser:/config
+      - ${HOME}:/home
+    environment:
+      FB_CONFIG: /config/config.json
+      FB_DATABASE: /config/file-browser.db
+      FB_ROOT: /home
+    restart: unless-stopped
+
+  glances:
+    container_name: glances
+    image: nicolargo/glances:ubuntu-latest-full
+    networks:
+      - utilities
+    pid: host
+    ports:
+      - 61208:61208
+    volumes:
+      - ${HOME}/vp-server/appdata/glances:/etc/glances
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/os-release:/etc/os-release:ro
+    environment:
+      GLANCES_OPT: -w
+    restart: unless-stopped
